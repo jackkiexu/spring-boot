@@ -583,6 +583,7 @@ public class ServerProperties {
 		}
 
 		/**
+		 * 参考地址: https://tomcat.apache.org/tomcat-8.0-doc/api/org/apache/catalina/valves/AbstractAccessLogValve.html
 		 * Tomcat access log properties.
 		 */
 		public static class Accesslog {
