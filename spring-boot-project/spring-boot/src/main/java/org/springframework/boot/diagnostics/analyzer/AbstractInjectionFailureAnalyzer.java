@@ -42,11 +42,13 @@ public abstract class AbstractInjectionFailureAnalyzer<T extends Throwable>
 	}
 
 	private String getDescription(Throwable rootFailure) {
+		// 获得异常堆栈中是UnsatisfiedDependencyException的异常,如果UnsatisfiedDependencyException不等于null,则调用getDescription
 		UnsatisfiedDependencyException unsatisfiedDependency = findMostNestedCause(
 				rootFailure, UnsatisfiedDependencyException.class);
 		if (unsatisfiedDependency != null) {
 			return getDescription(unsatisfiedDependency);
 		}
+		// 获得异常堆栈中是BeanInstantiationException的异常,如果不等于null,则调用getDescription
 		BeanInstantiationException beanInstantiationException = findMostNestedCause(
 				rootFailure, BeanInstantiationException.class);
 		if (beanInstantiationException != null) {

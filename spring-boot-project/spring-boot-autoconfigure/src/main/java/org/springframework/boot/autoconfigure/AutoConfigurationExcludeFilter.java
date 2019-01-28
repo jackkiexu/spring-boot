@@ -26,7 +26,7 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
 
-/**
+/** 这个类型过滤器主要过滤 被 @Configuration 注解修饰 或 在 spring.factories 中 EnableAutoConfiguration 对应的类
  * A {@link TypeFilter} implementation that matches registered auto-configuration classes.
  *
  * @author Stephane Nicoll
@@ -49,7 +49,7 @@ public class AutoConfigurationExcludeFilter implements TypeFilter, BeanClassLoad
 		return isConfiguration(metadataReader) && isAutoConfiguration(metadataReader);
 	}
 
-	private boolean isConfiguration(MetadataReader metadataReader) {
+	private boolean isConfiguration(MetadataReader metadataReader) { // 是否被 @Configuration 注解修饰的类
 		return metadataReader.getAnnotationMetadata()
 				.isAnnotated(Configuration.class.getName());
 	}

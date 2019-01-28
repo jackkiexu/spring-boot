@@ -90,6 +90,7 @@ public @interface ConditionalOnProperty {
 	String[] value() default {};
 
 	/**
+	 * 每个 property 的前缀(前缀后面自动带着 .)
 	 * A prefix that should be applied to each property. The prefix automatically ends
 	 * with a dot if not specified.
 	 * @return the prefix
@@ -97,6 +98,7 @@ public @interface ConditionalOnProperty {
 	String prefix() default "";
 
 	/**
+	 * 每个需要 check 的属性名称, 上面的 value 是这里 name 的别名
 	 * The name of the properties to test. If a prefix has been defined, it is applied to
 	 * compute the full key of each property. For instance if the prefix is
 	 * {@code app.config} and one value is {@code my-value}, the fully key would be
@@ -108,7 +110,7 @@ public @interface ConditionalOnProperty {
 	 */
 	String[] name() default {};
 
-	/**
+	/** 上面 name 对应的期待结果
 	 * The string representation of the expected value for the properties. If not
 	 * specified, the property must <strong>not</strong> be equals to {@code false}.
 	 * @return the expected value
@@ -116,6 +118,7 @@ public @interface ConditionalOnProperty {
 	String havingValue() default "";
 
 	/**
+	 * If the key missing, 则算作 match
 	 * Specify if the condition should match if the property is not set. Defaults to
 	 * {@code false}.
 	 * @return if should match if the property is missing

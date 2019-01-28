@@ -67,8 +67,11 @@ class SpringApplicationBannerPrinter {
 	}
 
 	public Banner print(Environment environment, Class<?> sourceClass, PrintStream out) {
+		// 获取 Banner
 		Banner banner = getBanner(environment);
+		// 调用 printBanner
 		banner.printBanner(environment, sourceClass, out);
+		// 实例化 PrintedBanner
 		return new PrintedBanner(banner, sourceClass);
 	}
 
@@ -76,12 +79,14 @@ class SpringApplicationBannerPrinter {
 		Banners banners = new Banners();
 		banners.addIfNotNull(getImageBanner(environment));
 		banners.addIfNotNull(getTextBanner(environment));
+		// 如果Banners对象的banners不为空，也就是至少找到了banner.gif，banner.jpg，banner.png，banner.txt其中的一个，那么返回该Banners对象，否则返回默认的SpringBootBanner对象
 		if (banners.hasAtLeastOneBanner()) {
 			return banners;
 		}
 		if (this.fallbackBanner != null) {
 			return this.fallbackBanner;
 		}
+		// 默认 Banner SpringBootBanner
 		return DEFAULT_BANNER;
 	}
 

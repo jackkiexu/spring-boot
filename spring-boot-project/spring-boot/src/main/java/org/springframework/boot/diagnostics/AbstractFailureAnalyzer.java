@@ -26,13 +26,14 @@ import org.springframework.core.ResolvableType;
  * @author Phillip Webb
  * @since 1.4.0
  */
-public abstract class AbstractFailureAnalyzer<T extends Throwable>
-		implements FailureAnalyzer {
+public abstract class AbstractFailureAnalyzer<T extends Throwable> implements FailureAnalyzer {
 
 	@Override
 	public FailureAnalysis analyze(Throwable failure) {
+		// 获取 failure 中异常堆栈 cause
 		T cause = findCause(failure, getCauseType());
 		if (cause != null) {
+			// 进行分析 cause
 			return analyze(failure, cause);
 		}
 		return null;
@@ -48,6 +49,7 @@ public abstract class AbstractFailureAnalyzer<T extends Throwable>
 	protected abstract FailureAnalysis analyze(Throwable rootFailure, T cause);
 
 	/**
+	 * 获得泛型参数的实际类型
 	 * Return the cause type being handled by the analyzer. By default the class generic
 	 * is used.
 	 * @return the cause type

@@ -89,8 +89,7 @@ public class SpringApplicationJsonEnvironmentPostProcessor
 	}
 
 	@Override
-	public void postProcessEnvironment(ConfigurableEnvironment environment,
-			SpringApplication application) {
+	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 		MutablePropertySources propertySources = environment.getPropertySources();
 		StreamSupport.stream(propertySources.spliterator(), false)
 				.map(JsonPropertyValue::get).filter(Objects::nonNull).findFirst()

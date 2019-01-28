@@ -48,6 +48,7 @@ class SpringBootBanner implements Banner {
 		for (String line : BANNER) {
 			printStream.println(line);
 		}
+		// 获取 Spring 的版本
 		String version = SpringBootVersion.getVersion();
 		version = (version == null ? "" : " (v" + version + ")");
 		StringBuilder padding = new StringBuilder();

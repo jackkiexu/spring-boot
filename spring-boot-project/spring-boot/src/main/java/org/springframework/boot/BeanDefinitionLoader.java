@@ -155,12 +155,14 @@ class BeanDefinitionLoader {
 			load(loader);
 		}
 		if (isComponent(source)) {
+			// 通过 AnnotatedBeanDefinitionReader 注入到 BeanDefinitionRegistry 里面
 			this.annotatedReader.register(source);
 			return 1;
 		}
 		return 0;
 	}
 
+	// 通过 groovyReader 进行加载
 	private int load(GroovyBeanDefinitionSource source) {
 		int before = this.xmlReader.getRegistry().getBeanDefinitionCount();
 		((GroovyBeanDefinitionReader) this.groovyReader).beans(source.getBeans());
@@ -279,6 +281,9 @@ class BeanDefinitionLoader {
 		return Package.getPackage(source.toString());
 	}
 
+	/**
+	 *  这个类是否被 @Component 注解修饰
+	 */
 	private boolean isComponent(Class<?> type) {
 		// This has to be a bit of a guess. The only way to be sure that this type is
 		// eligible is to make a bean definition out of it and try to instantiate it.

@@ -31,8 +31,7 @@ import org.springframework.util.ObjectUtils;
  * @author Phillip Webb
  * @since 2.0.0
  */
-public class TomcatServletWebServerFactoryCustomizer
-		implements WebServerFactoryCustomizer<TomcatServletWebServerFactory>, Ordered {
+public class TomcatServletWebServerFactoryCustomizer implements WebServerFactoryCustomizer<TomcatServletWebServerFactory>, Ordered {
 
 	private final ServerProperties serverProperties;
 

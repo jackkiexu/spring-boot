@@ -33,6 +33,7 @@ import org.springframework.core.env.PropertySources;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * Bean 生命周期的后置处理器, 主要是完成属性的注入
  * {@link BeanPostProcessor} to bind {@link PropertySources} to beans annotated with
  * {@link ConfigurationProperties}.
  *
@@ -48,8 +49,7 @@ public class ConfigurationPropertiesBindingPostProcessor implements BeanPostProc
 	/**
 	 * The bean name that this post-processor is registered with.
 	 */
-	public static final String BEAN_NAME = ConfigurationPropertiesBindingPostProcessor.class
-			.getName();
+	public static final String BEAN_NAME = ConfigurationPropertiesBindingPostProcessor.class.getName();
 
 	/**
 	 * The bean name of the configuration properties validator.
@@ -72,11 +72,8 @@ public class ConfigurationPropertiesBindingPostProcessor implements BeanPostProc
 	public void afterPropertiesSet() throws Exception {
 		// We can't use constructor injection of the application context because
 		// it causes eager factory bean initialization
-		this.beanFactoryMetadata = this.applicationContext.getBean(
-				ConfigurationBeanFactoryMetadata.BEAN_NAME,
-				ConfigurationBeanFactoryMetadata.class);
-		this.configurationPropertiesBinder = new ConfigurationPropertiesBinder(
-				this.applicationContext, VALIDATOR_BEAN_NAME);
+		this.beanFactoryMetadata = this.applicationContext.getBean(ConfigurationBeanFactoryMetadata.BEAN_NAME, ConfigurationBeanFactoryMetadata.class);
+		this.configurationPropertiesBinder = new ConfigurationPropertiesBinder(this.applicationContext, VALIDATOR_BEAN_NAME);
 	}
 
 	@Override
@@ -85,29 +82,28 @@ public class ConfigurationPropertiesBindingPostProcessor implements BeanPostProc
 	}
 
 	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName)
-			throws BeansException {
-		ConfigurationProperties annotation = getAnnotation(bean, beanName,
-				ConfigurationProperties.class);
+	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		// 获取类上的 @ConfigurationProperties  注解
+		ConfigurationProperties annotation = getAnnotation(bean, beanName, ConfigurationProperties.class);
 		if (annotation != null) {
 			bind(bean, beanName, annotation);
 		}
 		return bean;
 	}
 
+	/**
+	 * 进行属性的绑定
+	 */
 	private void bind(Object bean, String beanName, ConfigurationProperties annotation) {
 		ResolvableType type = getBeanType(bean, beanName);
 		Validated validated = getAnnotation(bean, beanName, Validated.class);
-		Annotation[] annotations = (validated == null ? new Annotation[] { annotation }
-				: new Annotation[] { annotation, validated });
-		Bindable<?> target = Bindable.of(type).withExistingValue(bean)
-				.withAnnotations(annotations);
+		Annotation[] annotations = (validated == null ? new Annotation[] { annotation } : new Annotation[] { annotation, validated });
+		Bindable<?> target = Bindable.of(type).withExistingValue(bean).withAnnotations(annotations);
 		try {
 			this.configurationPropertiesBinder.bind(target);
 		}
 		catch (Exception ex) {
-			throw new ConfigurationPropertiesBindException(beanName, bean, annotation,
-					ex);
+			throw new ConfigurationPropertiesBindException(beanName, bean, annotation, ex);
 		}
 	}
 
@@ -119,8 +115,7 @@ public class ConfigurationPropertiesBindingPostProcessor implements BeanPostProc
 		return ResolvableType.forClass(bean.getClass());
 	}
 
-	private <A extends Annotation> A getAnnotation(Object bean, String beanName,
-			Class<A> type) {
+	private <A extends Annotation> A getAnnotation(Object bean, String beanName, Class<A> type) {
 		A annotation = this.beanFactoryMetadata.findFactoryAnnotation(beanName, type);
 		if (annotation == null) {
 			annotation = AnnotationUtils.findAnnotation(bean.getClass(), type);

@@ -62,24 +62,21 @@ import org.springframework.util.ObjectUtils;
 public class ServletWebServerFactoryAutoConfiguration {
 
 	@Bean
-	public ServletWebServerFactoryCustomizer servletWebServerFactoryCustomizer(
-			ServerProperties serverProperties) {
+	public ServletWebServerFactoryCustomizer servletWebServerFactoryCustomizer(ServerProperties serverProperties) {
 		return new ServletWebServerFactoryCustomizer(serverProperties);
 	}
 
 	@Bean
 	@ConditionalOnClass(name = "org.apache.catalina.startup.Tomcat")
-	public TomcatServletWebServerFactoryCustomizer tomcatServletWebServerFactoryCustomizer(
-			ServerProperties serverProperties) {
+	public TomcatServletWebServerFactoryCustomizer tomcatServletWebServerFactoryCustomizer(ServerProperties serverProperties) {
 		return new TomcatServletWebServerFactoryCustomizer(serverProperties);
 	}
 
-	/**
+	/** 注入了两个 BeanPostProcessor
 	 * Registers a {@link WebServerFactoryCustomizerBeanPostProcessor}. Registered via
 	 * {@link ImportBeanDefinitionRegistrar} for early registration.
 	 */
-	public static class BeanPostProcessorsRegistrar
-			implements ImportBeanDefinitionRegistrar, BeanFactoryAware {
+	public static class BeanPostProcessorsRegistrar implements ImportBeanDefinitionRegistrar, BeanFactoryAware {
 
 		private ConfigurableListableBeanFactory beanFactory;
 
@@ -91,8 +88,7 @@ public class ServletWebServerFactoryAutoConfiguration {
 		}
 
 		@Override
-		public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
-				BeanDefinitionRegistry registry) {
+		public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
 			if (this.beanFactory == null) {
 				return;
 			}
@@ -104,10 +100,8 @@ public class ServletWebServerFactoryAutoConfiguration {
 					ErrorPageRegistrarBeanPostProcessor.class);
 		}
 
-		private void registerSyntheticBeanIfMissing(BeanDefinitionRegistry registry,
-				String name, Class<?> beanClass) {
-			if (ObjectUtils.isEmpty(
-					this.beanFactory.getBeanNamesForType(beanClass, true, false))) {
+		private void registerSyntheticBeanIfMissing(BeanDefinitionRegistry registry, String name, Class<?> beanClass) {
+			if (ObjectUtils.isEmpty(this.beanFactory.getBeanNamesForType(beanClass, true, false))) {
 				RootBeanDefinition beanDefinition = new RootBeanDefinition(beanClass);
 				beanDefinition.setSynthetic(true);
 				registry.registerBeanDefinition(name, beanDefinition);

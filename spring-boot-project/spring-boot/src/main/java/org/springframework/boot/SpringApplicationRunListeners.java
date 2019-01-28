@@ -61,6 +61,10 @@ class SpringApplicationRunListeners {
 		}
 	}
 
+	/**
+	 * 调用  SpringApplicationRunListener.contextLoaded 方法
+	 * @param context
+	 */
 	public void contextLoaded(ConfigurableApplicationContext context) {
 		for (SpringApplicationRunListener listener : this.listeners) {
 			listener.contextLoaded(context);

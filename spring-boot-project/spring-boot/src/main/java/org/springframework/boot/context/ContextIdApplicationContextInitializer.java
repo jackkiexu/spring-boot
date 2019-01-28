@@ -34,8 +34,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @author Andy Wilkinson
  */
-public class ContextIdApplicationContextInitializer implements
-		ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
+public class ContextIdApplicationContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
 
 	private int order = Ordered.LOWEST_PRECEDENCE - 10;
 
@@ -52,8 +51,7 @@ public class ContextIdApplicationContextInitializer implements
 	public void initialize(ConfigurableApplicationContext applicationContext) {
 		ContextId contextId = getContextId(applicationContext);
 		applicationContext.setId(contextId.getId());
-		applicationContext.getBeanFactory().registerSingleton(ContextId.class.getName(),
-				contextId);
+		applicationContext.getBeanFactory().registerSingleton(ContextId.class.getName(), contextId);
 	}
 
 	private ContextId getContextId(ConfigurableApplicationContext applicationContext) {
@@ -64,6 +62,9 @@ public class ContextIdApplicationContextInitializer implements
 		return new ContextId(getApplicationId(applicationContext.getEnvironment()));
 	}
 
+	/**
+	 * 通过 Environment 获取 spring.application.name 对应的值, 若没有则直接返回 application
+	 */
 	private String getApplicationId(ConfigurableEnvironment environment) {
 		String name = environment.getProperty("spring.application.name");
 		return StringUtils.hasText(name) ? name : "application";

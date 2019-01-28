@@ -61,12 +61,12 @@ public class ResourceBanner implements Banner {
 	public void printBanner(Environment environment, Class<?> sourceClass,
 			PrintStream out) {
 		try {
+			// 获取
 			String banner = StreamUtils.copyToString(this.resource.getInputStream(),
 					environment.getProperty("spring.banner.charset", Charset.class,
 							StandardCharsets.UTF_8));
 
-			for (PropertyResolver resolver : getPropertyResolvers(environment,
-					sourceClass)) {
+			for (PropertyResolver resolver : getPropertyResolvers(environment, sourceClass)) {
 				banner = resolver.resolvePlaceholders(banner);
 			}
 			out.println(banner);

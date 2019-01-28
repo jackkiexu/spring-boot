@@ -59,29 +59,24 @@ class ConfigurationPropertiesBinder {
 
 	private volatile Binder binder;
 
-	ConfigurationPropertiesBinder(ApplicationContext applicationContext,
-			String validatorBeanName) {
+	ConfigurationPropertiesBinder(ApplicationContext applicationContext, String validatorBeanName) {
 		this.applicationContext = applicationContext;
-		this.propertySources = new PropertySourcesDeducer(applicationContext)
-				.getPropertySources();
-		this.configurationPropertiesValidator = getConfigurationPropertiesValidator(
-				applicationContext, validatorBeanName);
-		this.jsr303Validator = ConfigurationPropertiesJsr303Validator
-				.getIfJsr303Present(applicationContext);
+		this.propertySources = new PropertySourcesDeducer(applicationContext).getPropertySources();
+		this.configurationPropertiesValidator = getConfigurationPropertiesValidator(applicationContext, validatorBeanName);
+		this.jsr303Validator = ConfigurationPropertiesJsr303Validator.getIfJsr303Present(applicationContext);
 	}
 
 	public void bind(Bindable<?> target) {
-		ConfigurationProperties annotation = target
-				.getAnnotation(ConfigurationProperties.class);
-		Assert.state(annotation != null,
-				() -> "Missing @ConfigurationProperties on " + target);
+		// 获取 ConfigurationProperties 属性
+		ConfigurationProperties annotation = target.getAnnotation(ConfigurationProperties.class);
+		Assert.state(annotation != null, () -> "Missing @ConfigurationProperties on " + target);
+		// 获取属性校验器
 		List<Validator> validators = getValidators(target);
 		BindHandler bindHandler = getBindHandler(annotation, validators);
 		getBinder().bind(annotation.prefix(), target, bindHandler);
 	}
 
-	private Validator getConfigurationPropertiesValidator(
-			ApplicationContext applicationContext, String validatorBeanName) {
+	private Validator getConfigurationPropertiesValidator(ApplicationContext applicationContext, String validatorBeanName) {
 		if (applicationContext.containsBean(validatorBeanName)) {
 			return applicationContext.getBean(validatorBeanName, Validator.class);
 		}
@@ -93,8 +88,7 @@ class ConfigurationPropertiesBinder {
 		if (this.configurationPropertiesValidator != null) {
 			validators.add(this.configurationPropertiesValidator);
 		}
-		if (this.jsr303Validator != null
-				&& target.getAnnotation(Validated.class) != null) {
+		if (this.jsr303Validator != null && target.getAnnotation(Validated.class) != null) {
 			validators.add(this.jsr303Validator);
 		}
 		if (target.getValue() != null && target.getValue().get() instanceof Validator) {
@@ -103,8 +97,10 @@ class ConfigurationPropertiesBinder {
 		return validators;
 	}
 
-	private BindHandler getBindHandler(ConfigurationProperties annotation,
-			List<Validator> validators) {
+	/**
+	 * 获取 Bean 的属性绑定器
+	 */
+	private BindHandler getBindHandler(ConfigurationProperties annotation, List<Validator> validators) {
 		BindHandler handler = new IgnoreTopLevelConverterNotFoundBindHandler();
 		if (annotation.ignoreInvalidFields()) {
 			handler = new IgnoreErrorsBindHandler(handler);
@@ -114,8 +110,7 @@ class ConfigurationPropertiesBinder {
 			handler = new NoUnboundElementsBindHandler(handler, filter);
 		}
 		if (!validators.isEmpty()) {
-			handler = new ValidationBindHandler(handler,
-					validators.toArray(new Validator[0]));
+			handler = new ValidationBindHandler(handler, validators.toArray(new Validator[0]));
 		}
 		return handler;
 	}

@@ -53,6 +53,9 @@ class EnableConfigurationPropertiesImportSelector implements ImportSelector {
 			ConfigurationPropertiesBeanRegistrar.class.getName(),
 			ConfigurationPropertiesBindingPostProcessorRegistrar.class.getName() };
 
+	/**
+	 * 返回注入的 Bean 的名称
+	 */
 	@Override
 	public String[] selectImports(AnnotationMetadata metadata) {
 		return IMPORTS;
@@ -72,11 +75,9 @@ class EnableConfigurationPropertiesImportSelector implements ImportSelector {
 		}
 
 		private List<Class<?>> getTypes(AnnotationMetadata metadata) {
-			MultiValueMap<String, Object> attributes = metadata
-					.getAllAnnotationAttributes(
+			MultiValueMap<String, Object> attributes = metadata.getAllAnnotationAttributes(
 							EnableConfigurationProperties.class.getName(), false);
-			return collectClasses(attributes == null ? Collections.emptyList()
-					: attributes.get("value"));
+			return collectClasses(attributes == null ? Collections.emptyList() : attributes.get("value"));
 		}
 
 		private List<Class<?>> collectClasses(List<?> values) {
@@ -85,14 +86,16 @@ class EnableConfigurationPropertiesImportSelector implements ImportSelector {
 					.collect(Collectors.toList());
 		}
 
-		private void register(BeanDefinitionRegistry registry,
-				ConfigurableListableBeanFactory beanFactory, Class<?> type) {
+		private void register(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory, Class<?> type) {
 			String name = getName(type);
 			if (!containsBeanDefinition(beanFactory, name)) {
 				registerBeanDefinition(registry, name, type);
 			}
 		}
 
+		/**
+		 * 获取 @ConfigurationProperties 的属性
+		 */
 		private String getName(Class<?> type) {
 			ConfigurationProperties annotation = AnnotationUtils.findAnnotation(type,
 					ConfigurationProperties.class);
@@ -101,8 +104,10 @@ class EnableConfigurationPropertiesImportSelector implements ImportSelector {
 					: type.getName());
 		}
 
-		private boolean containsBeanDefinition(
-				ConfigurableListableBeanFactory beanFactory, String name) {
+		/**
+		 * 判断工厂中是否存在
+		 */
+		private boolean containsBeanDefinition(ConfigurableListableBeanFactory beanFactory, String name) {
 			if (beanFactory.containsBeanDefinition(name)) {
 				return true;
 			}
@@ -114,14 +119,17 @@ class EnableConfigurationPropertiesImportSelector implements ImportSelector {
 			return false;
 		}
 
-		private void registerBeanDefinition(BeanDefinitionRegistry registry, String name,
-				Class<?> type) {
+		/**
+		 * 将 BeanDefinition 注入 BeanDefinitionRegistry
+		 */
+		private void registerBeanDefinition(BeanDefinitionRegistry registry, String name, Class<?> type) {
 			assertHasAnnotation(type);
 			GenericBeanDefinition definition = new GenericBeanDefinition();
 			definition.setBeanClass(type);
 			registry.registerBeanDefinition(name, definition);
 		}
 
+		// 判断被注入的类 是否 被 @ConfigurationProperties
 		private void assertHasAnnotation(Class<?> type) {
 			Assert.notNull(
 					AnnotationUtils.findAnnotation(type, ConfigurationProperties.class),

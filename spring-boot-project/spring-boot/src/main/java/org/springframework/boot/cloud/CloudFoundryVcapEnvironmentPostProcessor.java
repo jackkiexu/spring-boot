@@ -113,8 +113,7 @@ public class CloudFoundryVcapEnvironmentPostProcessor
 	}
 
 	@Override
-	public void postProcessEnvironment(ConfigurableEnvironment environment,
-			SpringApplication application) {
+	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 		if (CloudPlatform.CLOUD_FOUNDRY.isActive(environment)) {
 			Properties properties = new Properties();
 			addWithPrefix(properties, getPropertiesFromApplication(environment),

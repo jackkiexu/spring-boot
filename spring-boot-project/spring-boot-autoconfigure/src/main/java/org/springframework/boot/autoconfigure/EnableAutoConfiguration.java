@@ -44,7 +44,7 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
  * When using {@link SpringBootApplication}, the auto-configuration of the context is
  * automatically enabled and adding this annotation has therefore no additional effect.
  * <p>
- * Auto-configuration tries to be as intelligent as possible and will back-away as you
+ * Auto-configuration tries to be as intelligent(智能的) as possible and will back-away as you
  * define more of your own configuration. You can always manually {@link #exclude()} any
  * configuration that you never want to apply (use {@link #excludeName()} if you don't
  * have access to them). You can also exclude them via the

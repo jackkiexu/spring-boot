@@ -46,24 +46,25 @@ class OnWebApplicationCondition extends SpringBootCondition {
 			+ "support.GenericWebApplicationContext";
 
 	@Override
-	public ConditionOutcome getMatchOutcome(ConditionContext context,
-			AnnotatedTypeMetadata metadata) {
-		boolean required = metadata
-				.isAnnotated(ConditionalOnWebApplication.class.getName());
+	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		// 检查是否被 @ConditionalOnWebApplication 注解修饰
+		boolean required = metadata.isAnnotated(ConditionalOnWebApplication.class.getName());
+		// 判断是否是WebApplication
 		ConditionOutcome outcome = isWebApplication(context, metadata, required);
 		if (required && !outcome.isMatch()) {
+			// 如果有@ConditionalOnWebApplication 注解,但是不是WebApplication环境,则返回不匹配
 			return ConditionOutcome.noMatch(outcome.getConditionMessage());
 		}
 		if (!required && outcome.isMatch()) {
+			// 如果没有被@ConditionalOnWebApplication 注解,但是是WebApplication环境,则返回不匹配
 			return ConditionOutcome.noMatch(outcome.getConditionMessage());
 		}
+		// 如果被@ConditionalOnWebApplication 注解,并且是WebApplication环境,则返回不匹配
 		return ConditionOutcome.match(outcome.getConditionMessage());
 	}
 
-	private ConditionOutcome isWebApplication(ConditionContext context,
-			AnnotatedTypeMetadata metadata, boolean required) {
-		ConditionMessage.Builder message = ConditionMessage.forCondition(
-				ConditionalOnWebApplication.class, required ? "(required)" : "");
+	private ConditionOutcome isWebApplication(ConditionContext context, AnnotatedTypeMetadata metadata, boolean required) {
+		ConditionMessage.Builder message = ConditionMessage.forCondition(ConditionalOnWebApplication.class, required ? "(required)" : "");
 		Type type = deduceType(metadata);
 		if (Type.SERVLET == type) {
 			return isServletWebApplication(context);
@@ -74,39 +75,40 @@ class OnWebApplicationCondition extends SpringBootCondition {
 		else {
 			ConditionOutcome servletOutcome = isServletWebApplication(context);
 			if (servletOutcome.isMatch() && required) {
-				return new ConditionOutcome(servletOutcome.isMatch(),
-						message.because(servletOutcome.getMessage()));
+				return new ConditionOutcome(servletOutcome.isMatch(), message.because(servletOutcome.getMessage()));
 			}
 			ConditionOutcome reactiveOutcome = isReactiveWebApplication(context);
 			if (reactiveOutcome.isMatch() && required) {
-				return new ConditionOutcome(reactiveOutcome.isMatch(),
-						message.because(reactiveOutcome.getMessage()));
+				return new ConditionOutcome(reactiveOutcome.isMatch(), message.because(reactiveOutcome.getMessage()));
 			}
 			boolean finalOutcome = (required
 					? servletOutcome.isMatch() && reactiveOutcome.isMatch()
 					: servletOutcome.isMatch() || reactiveOutcome.isMatch());
 			return new ConditionOutcome(finalOutcome,
-					message.because(servletOutcome.getMessage()).append("and")
-							.append(reactiveOutcome.getMessage()));
+					message.because(servletOutcome.getMessage()).append("and").append(reactiveOutcome.getMessage()));
 		}
 	}
 
 	private ConditionOutcome isServletWebApplication(ConditionContext context) {
 		ConditionMessage.Builder message = ConditionMessage.forCondition("");
+		// 判断GenericWebApplicationContext是否在类路径中,如果不存在,则返回不匹配
 		if (!ClassUtils.isPresent(WEB_CONTEXT_CLASS, context.getClassLoader())) {
 			return ConditionOutcome
 					.noMatch(message.didNotFind("web application classes").atAll());
 		}
+		// 容器里是否有名为session的scope,如果存在,则返回匹配
 		if (context.getBeanFactory() != null) {
 			String[] scopes = context.getBeanFactory().getRegisteredScopeNames();
 			if (ObjectUtils.containsElement(scopes, "session")) {
 				return ConditionOutcome.match(message.foundExactly("'session' scope"));
 			}
 		}
+		// Environment 是否为 ConfigurableWebEnvironment,如果是的话,则返回匹配
 		if (context.getEnvironment() instanceof ConfigurableWebEnvironment) {
 			return ConditionOutcome
 					.match(message.foundExactly("ConfigurableWebEnvironment"));
 		}
+		// 当前ResourceLoader是否为WebApplicationContext,如果是,则返回匹配
 		if (context.getResourceLoader() instanceof WebApplicationContext) {
 			return ConditionOutcome.match(message.foundExactly("WebApplicationContext"));
 		}

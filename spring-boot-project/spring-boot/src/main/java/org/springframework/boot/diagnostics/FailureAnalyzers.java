@@ -62,13 +62,15 @@ final class FailureAnalyzers implements SpringBootExceptionReporter {
 	FailureAnalyzers(ConfigurableApplicationContext context, ClassLoader classLoader) {
 		Assert.notNull(context, "Context must not be null");
 		this.classLoader = (classLoader == null ? context.getClassLoader() : classLoader);
+		// 加载 FailureAnalyzer
 		this.analyzers = loadFailureAnalyzers(this.classLoader);
+		// 初始化 FailureAnalyzer
 		prepareFailureAnalyzers(this.analyzers, context);
 	}
 
 	private List<FailureAnalyzer> loadFailureAnalyzers(ClassLoader classLoader) {
-		List<String> analyzerNames = SpringFactoriesLoader
-				.loadFactoryNames(FailureAnalyzer.class, classLoader);
+		// 通过 Spring 的 Spi 机制进行加载 FailureAnalyzer 的扩展
+		List<String> analyzerNames = SpringFactoriesLoader.loadFactoryNames(FailureAnalyzer.class, classLoader);
 		List<FailureAnalyzer> analyzers = new ArrayList<>();
 		for (String analyzerName : analyzerNames) {
 			try {
@@ -81,6 +83,7 @@ final class FailureAnalyzers implements SpringBootExceptionReporter {
 				logger.trace("Failed to load " + analyzerName, ex);
 			}
 		}
+		// 根据 Order 进行排序
 		AnnotationAwareOrderComparator.sort(analyzers);
 		return analyzers;
 	}

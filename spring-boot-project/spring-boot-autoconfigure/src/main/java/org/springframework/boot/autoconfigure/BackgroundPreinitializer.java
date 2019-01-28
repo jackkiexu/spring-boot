@@ -46,8 +46,7 @@ import org.springframework.http.converter.support.AllEncompassingFormHttpMessage
  * @since 1.3.0
  */
 @Order(LoggingApplicationListener.DEFAULT_ORDER + 1)
-public class BackgroundPreinitializer
-		implements ApplicationListener<SpringApplicationEvent> {
+public class BackgroundPreinitializer implements ApplicationListener<SpringApplicationEvent> {
 
 	private static final AtomicBoolean preinitializationStarted = new AtomicBoolean(
 			false);
@@ -72,6 +71,7 @@ public class BackgroundPreinitializer
 		}
 	}
 
+	// 提前初始化
 	private void performPreinitialization() {
 		try {
 			Thread thread = new Thread(new Runnable() {

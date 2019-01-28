@@ -54,7 +54,6 @@ class ServletWebServerFactoryConfiguration {
 	@ConditionalOnClass({ Servlet.class, Tomcat.class, UpgradeProtocol.class })
 	@ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT)
 	public static class EmbeddedTomcat {
-
 		@Bean
 		public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
 			return new TomcatServletWebServerFactory();
@@ -66,8 +65,7 @@ class ServletWebServerFactoryConfiguration {
 	 * Nested configuration if Jetty is being used.
 	 */
 	@Configuration
-	@ConditionalOnClass({ Servlet.class, Server.class, Loader.class,
-			WebAppContext.class })
+	@ConditionalOnClass({ Servlet.class, Server.class, Loader.class, WebAppContext.class })
 	@ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT)
 	public static class EmbeddedJetty {
 
